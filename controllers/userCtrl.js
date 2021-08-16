@@ -1,5 +1,9 @@
 const Users = require('../models/userModel')
+const bcrypt = require("bcrypt")
+const jwt = require ("jsonwebtoken")
+const sendMail= require("./sendMail")
 
+const {CLIENT_URL} = process.env
 
 const userCtrl = {
 
@@ -15,9 +19,28 @@ const userCtrl = {
             if(!name || !email || !password)
               return res.status(400).json({msg:'Please fill in all the fields'})
           //  console.log(req.body)
-            res.json({msg:"Register Test"})
-
            
+
+
+            const user = await Users.findOne({email})
+
+            if(user) return res.status(400).json({msg:"Email already exists"})
+
+            if(password.length<6)  return res.status(400).json({msg:"password must be 6 characters length"})
+ 
+            const passwordHash = await bcrypt.hash(password,12)
+
+            const newUser ={
+                name,email,password:passwordHash
+            }
+
+            const activation_token = createActivationToken(newUser)
+
+            const url = `${CLIENT_URL}/user/activate/${activation_token}`
+
+            sendMail(email, url)
+
+            res.json({msg:"Resgistration done , please activate your account"})
 
         }catch(err){
 
@@ -25,12 +48,65 @@ const userCtrl = {
 
         }
 
+    },
+
+
+    activateEmail: async(req,res) =>{
+
+        try{
+
+           const {activation_token} = req.body
+           const user = jwt.verify(activation_token, process.env.ACTIVATION_TOKEN_SECRET)
+           //console.log(user)
+
+           const {name, email, password} = user
+
+           const check = await Users.findOne({email})
+
+           if(check) return res.status(400).json({msg:"This email already exists"})
+
+
+           const newUser = new Users({
+               name,email,password
+           })
+
+           await newUser.save()
+
+           res.json({msg:"Account activated"})
+
+        }catch(err){
+            return res.status(500).json({msg:err.message})
+        }
     }
+
+
+
 }
+
+
+   
 
 function validateEmail(email){
     const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     return re.test(email)
+}
+
+
+const createActivationToken = (payload) => {
+
+    return jwt.sign(payload, process.env.ACTIVATION_TOKEN_SECRET,{expiresIn:"5m"})
+}
+
+
+const createAccessToken = (payload) => {
+
+    return jwt.sign(payload, process.env.ACTIVATION_TOKEN_SECRET,{expiresIn:"15m"})
+}
+
+
+const createRefreshToken = (payload) => {
+
+    return jwt.sign(payload, process.env.ACTIVATION_TOKEN_SECRET,{expiresIn:"7d"})
 }
 
 module.exports = userCtrl
