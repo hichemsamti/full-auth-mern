@@ -22,7 +22,7 @@ const oauth2Client = new OAuth2(
 
 // send mail
 
-const sendEmail = (to , url) => {
+const sendEmail = (to , url , txt) => {
     oauth2Client.setCredentials({
         refresh_token: MAILING_SERVICE_REFRESH_TOKEN
     })
@@ -49,7 +49,7 @@ const sendEmail = (to , url) => {
         to:to,
         subject: "Full Auth",
         html:`
-        <p>Click here to activate your account</p>
+        <p>${txt}</p>
          <a href=${url}>activate</a>
         `
     }
