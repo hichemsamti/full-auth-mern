@@ -176,10 +176,38 @@ const userCtrl = {
             
             console.log(req.user)
 
-            await Users.findOneAndUpdate({})
+            await Users.findOneAndUpdate({_id:req.user.id},{
+                password: passwordHash
+            })
+
+            res.json({msg:"Password changed"})
 
         }catch(err){
 
+            return res.status(500).json({msg:err.message})
+        }
+    },
+
+
+    getUserInfor:async(req,res) =>{
+
+        try{
+            
+            const user = await Users.findById(req.user.id).select('-password')
+
+            res.json({user})
+        }catch(err){
+            return res.status(500).json({msg:err.message})
+        }
+    },
+
+
+    getUsersAllInfor: async(req,res) =>{
+
+        try{
+           
+           
+        } catch(err){
             return res.status(500).json({msg:err.message})
         }
     }
