@@ -1,13 +1,14 @@
 import React from 'react'
 
 import {Link} from "react-router-dom"
+import "./header.css"
 
 export default function Header() {
     return (
         <header>
             <div className = "logo">
 
-                <hi><Link to="/">Full Auth</Link></hi>
+                <h1><Link to="/">Full Auth</Link></h1>
             </div>
 
             <ul>
