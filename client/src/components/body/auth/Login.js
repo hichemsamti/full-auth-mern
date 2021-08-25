@@ -41,7 +41,7 @@ export default function Login() {
             setUser({...user , err:'', success:res.data.msg})
 
             localStorage.setItem('firstLogin',true)
-            dispatch(dispatchLogin)
+            dispatch(dispatchLogin())
             history.push('/')
         }catch(err){
             console.log(err.response)
@@ -79,6 +79,9 @@ export default function Login() {
                    
                 </div>
             </form>
+
+            <p>New here ? <Link to="/register">Register</Link></p>
+
         </div>
     )
 }

@@ -55,3 +55,15 @@
 
 
 }
+
+.login_page {
+
+    margin: 10px 0;
+
+}
+
+.login_page a{
+
+    color: #111;
+    font-weight: 600;
+}
