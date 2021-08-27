@@ -93,16 +93,22 @@ const userCtrl = {
             const isMatch = await bcrypt.compare(password, user.password)
             if(!isMatch) return res.status(400).json({msg:"Password is incorrect"})
 
-            const refresh_token = createRefreshToken({id:user.id})
-
+            const refresh_token = createRefreshToken({id:user._id})
+            console.log({refresh_token})
             res.cookie('refreshtoken', refresh_token, {
-
+             
                  httpOnly: true,
                  path: "/user/refresh_token",
-                 maxAge:7*24*60*60*1000 // 7days
+                 maxAge:7*24*60*60*1000 // 7days,
+                 
 
 
             })
+
+            console.log(req.cookies)
+
+           console.log("doneeeeee")
+    
 
             res.json({msg:"Login success"})
 
@@ -120,7 +126,7 @@ const userCtrl = {
             
             const rf_token = req.cookies.refreshtoken
 
-            console.log(rf_token)
+            console.log({rf_token})
 
            if(!rf_token) return res.status(400).json({msg:'Please login'})
 

@@ -36,7 +36,7 @@ export default function Login() {
 
         try{
 
-            const res = await axios.post('http://localhost:5000/user/login', {email, password})
+            const res = await axios.post('/user/login', {email, password})
             console.log(res)
             setUser({...user , err:'', success:res.data.msg})
 
