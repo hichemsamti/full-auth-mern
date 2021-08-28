@@ -8,17 +8,60 @@ import axios from 'axios'
 
 export default function Header() {
     const auth = useSelector(state => state.auth )
-    console.log(auth)
+   
 
     const {user, isLogged} = auth
 
-    const userLink = () =>{
+    console.log(user.name)
+    console.log(isLogged)
 
-        return (<li>
-              <Link to="/">
-               <img src={user.avatar} alt=""/> {user.name}
-              </Link>
-        </li>)
+    const handleLogout = async () =>{
+
+        try{
+         
+            await axios.get('/user/logout')
+            localStorage.removeItem("firstLogin")
+            window.location.href = "/"
+
+        }catch(err){
+
+            
+        }
+    }
+
+    const userLink = () => {
+        return <li className="drop-nav">
+            <Link to="#" className="avatar">
+                
+                {user.name}
+
+                <i className="fas fa-arrow-down"></i>
+            </Link>
+
+            <ul className="dropdown">
+
+                <li>
+                 <Link to="/profile">
+                 Profile
+                </Link>
+                </li>
+
+                <li>
+                 <Link to="/" onClick={handleLogout}>
+                 Logout
+                </Link>
+                </li>
+            </ul>
+           
+            
+            
+            
+        </li>
+    }
+
+
+    const transForm = {
+        transform: isLogged ? "translateY(-5px)" : 0 
     }
     return (
         <header>
@@ -27,13 +70,12 @@ export default function Header() {
                 <h1><Link to="/">Full Auth</Link></h1>
             </div>
 
-            <ul>
+            <ul  style={transForm} >
                 <li><Link to="/"><i className="fas fa-shopping-cart"></i>Cart</Link></li>
                 {
-                    isLogged 
+                    isLogged
                     ? userLink()
-                    :
-                    <li><Link to="/login"><i className="fas fa-user"></i>Sign</Link></li>
+                    :<li><Link to="/login"><i className="fas fa-user"></i> Sign in</Link></li>
                 }
                
 

@@ -200,8 +200,8 @@ const userCtrl = {
         try{
             
             const user = await Users.findById(req.user.id).select('-password')
-
-            res.json({user})
+            console.log(user)
+            res.json(user)
         }catch(err){
             return res.status(500).json({msg:err.message})
         }

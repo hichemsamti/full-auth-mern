@@ -4,7 +4,7 @@ import { useDispatch,useSelector } from "react-redux"
 import Header from "./components/header/Header"
 import Body from "./components/body/Body"
 import axios from "axios"
-import {dispatchLogin} from "./redux/actions/authAction"
+import {dispatchLogin,fetchUser,dispatchGetUser} from "./redux/actions/authAction"
 
 function App() {
 
@@ -21,6 +21,9 @@ useEffect(()=>{
 
           const res = await axios.get("/user/refresh_token")
           dispatch({type:"GET_TOKEN", payload:res.data.access_token})
+          return fetchUser(token).then(res => {
+            dispatch(dispatchGetUser(res))
+          })
         
       }
          
@@ -45,7 +48,7 @@ useEffect(()=> {
      }
       getUser()
     }
-},[token])
+},[token,dispatch])
 
   return (
     <Router>
