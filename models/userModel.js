@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
 
     avatar:{
         type:String,
-        default:"https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.web2present.com%2Four-team%2Fno-avatar-350x350%2F&psig=AOvVaw1aiuJCyaXf-199phIQdVpR&ust=1629115396638000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCNiBtPb9svICFQAAAAAdAAAAABAN"
+        default:"https://bibliosud.omekas.mind-and-go.net/files/large/17ea8760c7dc81909f032ce92d94e4f340b1585a.jpg"
        
 
     },
