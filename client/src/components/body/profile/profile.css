@@ -1,0 +1,11 @@
+.profile_page{
+    width:100%;
+    display:flex;
+    flex-wrap:wrap;
+}
+
+ .profilr_page .col-left{
+
+   max-width: 400px;
+   min-width: 300px;
+}
