@@ -32,10 +32,79 @@ function Profile() {
     const {name,email,password,cf_password,err,success} = data
 
 
+
+    const changeAvatar = async(e) => {
+
+        e.preventDefault()
+
+        try{
+
+            const file = e.target.files[0]
+
+            if(!file) return setData({...data, err:"No file uploaded", success:""})
+
+            if(file.size > 1024*1024) return setData({...data, err:"file is too large", success:""})
+
+            if(file.minetype !== "image/jpeg" && file.minetype !=="image/png") return setData({...data, err:"invalid format" , success:""})
+
+            let formData = new FormData()
+
+            formData.append("file",file)
+
+            setLoading(true)
+            const res = await axios.post('/api/upload_avatar',formData,{
+                headers: {"content-type":"multipart/form-data", Authorization:token}
+            })
+
+            setLoading(false)
+            setAvatar(res.data.url)
+
+        }catch(err){
+
+            setData({...data, err:err.response.data.msg, success:""})
+
+
+
+        }
+    }
+
+
+
     const handleChange = e =>{
 
         const {name, value} = e.target
         setData({...data, [name]:value, err:'', success:''})
+
+
+    }
+
+
+
+    const updatePassword = () => {
+
+        if(isLength(password))
+            return setData({...data,err:'Password must be at least 6 characters length', success:''})
+        
+
+        if(isMatch(password,cf_password))
+            return setData({...data,err:"Password does not match", success:""})
+
+
+        try{
+
+           axios.patch('/user/reset',{
+              password
+           },{
+               headers: {Authorization : token}
+           })
+
+           setData({...data, err:"", success:'Updated successfully'})
+       
+       
+        } catch(err){
+
+            setData({...data, err: err.response.data.msg, success:""})
+        }
 
 
     }
@@ -68,6 +137,16 @@ function Profile() {
 
 
 
+    const handleUpdate = () => {
+
+        if(name || avatar) updateInfor()
+        if(password) updatePassword()
+
+    }
+
+
+
+
     return (
         <div className="profile_page">
             <div className="col-left">
@@ -83,7 +162,7 @@ function Profile() {
                        <span>
                        <i className="fas fa-camera"></i>
                        <p>Change</p>
-                       <input type="file" name="file" id="file_up"/>
+                       <input type="file" name="file" id="file_up" onChange={changeAvatar}/>
                        </span>
 
                   </div>
@@ -119,7 +198,13 @@ function Profile() {
 
                   </div>
 
-                  <button disabled={loading}>Update</button>
+                  <div>
+                      <em>
+                          *if you update your password here you will not able to login with google or facebook.
+                      </em>
+                  </div>
+
+                  <button disabled={loading} onClick={handleUpdate}>Update</button>
             </div>
             <div className="col-right">
 
