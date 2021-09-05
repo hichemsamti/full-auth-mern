@@ -5,6 +5,7 @@ import {Link} from "react-router-dom"
 import {isLength, isMatch} from "../../utils/validation/Validation"
 import {showSuccessMsg,showErrMsg} from "../../utils/notifications/Notification"
 import "./profile.css"
+import {fetchAllUsers , dispatchGetAllUsers} from "../../../redux/actions/usersAction"
 
 
 
@@ -21,6 +22,7 @@ function Profile() {
 
     const auth =useSelector(state =>state.auth)
     const token= useSelector(state =>state.token)
+    const users = useSelector(state => state.users)
 
     const {user, isAdmin} = auth
     const [data, setData] = useState(initialState)
@@ -30,8 +32,16 @@ function Profile() {
 
 
     const {name,email,password,cf_password,err,success} = data
+    const dispatch = useDispatch()
+    useEffect(()=>{
+        if(isAdmin){
+            return fetchAllUsers(token).then(res =>{
+                dispatch(dispatchGetAllUsers(res))
 
+            })
+        }
 
+    },[token, isAdmin, dispatch,callback])
 
     const changeAvatar = async(e) => {
 
@@ -45,7 +55,7 @@ function Profile() {
 
             if(file.size > 1024*1024) return setData({...data, err:"file is too large", success:""})
 
-            if(file.minetype !== "image/jpeg" && file.minetype !=="image/png") return setData({...data, err:"invalid format" , success:""})
+            if(file.type !== "image/jpeg" && file.type !=="image/png") return setData({...data, err:"invalid format" , success:""})
 
             let formData = new FormData()
 
@@ -86,13 +96,13 @@ function Profile() {
             return setData({...data,err:'Password must be at least 6 characters length', success:''})
         
 
-        if(isMatch(password,cf_password))
+        if(!isMatch(password,cf_password))
             return setData({...data,err:"Password does not match", success:""})
 
 
         try{
 
-           axios.patch('/user/reset',{
+           axios.post('/user/reset',{
               password
            },{
                headers: {Authorization : token}
@@ -148,6 +158,14 @@ function Profile() {
 
 
     return (
+        <>
+        <div>
+            {err && showErrMsg(err)}
+            {success && showSuccessMsg(success)}
+            {loading && <h3>Loading...</h3>}
+
+        </div>
+
         <div className="profile_page">
             <div className="col-left">
                   <h2>{isAdmin ? "Admin Profile" : "UserProfile"}  </h2>
@@ -170,7 +188,7 @@ function Profile() {
 
                   <div className="form_group">
                      <label htmlFor="name">Name</label>
-                     <input type="text" name="name" id=""
+                     <input type="text" name="name" 
                      placeholder="Enter name" value={name} defaultValue={user.name} onChange={handleChange}/>
 
                   </div>
@@ -178,7 +196,7 @@ function Profile() {
 
                   <div className="form_group">
                      <label htmlFor="email">Email</label>
-                     <input type="email" name="email" id=""
+                     <input type="email" name="email" 
                      placeholder="Enter email" value={email} defaultValue={user.email} disabled/>
 
                   </div>
@@ -186,14 +204,14 @@ function Profile() {
 
                   <div className="form_group">
                      <label htmlFor="password">new Password</label>
-                     <input type="password" name="password" id=""
+                     <input type="password" name="password" 
                      placeholder="Enter Password" value={password} onChange={handleChange} />
 
                 </div>
 
                   <div className="form_group">
                      <label htmlFor="cf_password">Confirm Password</label>
-                     <input type="password" name="cf_password" id=""
+                     <input type="password" name="cf_password" 
                      placeholder="Confirm Password" value={cf_password} onChange={handleChange} />
 
                   </div>
@@ -227,13 +245,44 @@ function Profile() {
                             </thead>
 
                             <tbody>
+                                {
+                                   users.map(user => {
 
-                                    <td>ID</td>
+                                        <tr key={user._id}>
+
+                                             <td>{user._id}</td>
                                  
-                                   <td>Name</td>
-                                   <td>Email</td>
-                                   <td>Admin</td>
-                                   <td>Action</td>
+                                             <td>{user.name}</td>
+                                            
+                                             <td>{user.email}</td>
+                                             
+                                             <td>{
+                                                 
+                                                 user.role === 1
+                                                 ? <i className="fas fa-check" title="Admin"></i>
+                                                 : <i className='fas fa-times' title="User"></i>
+                                                 
+                                                 }
+                                                 
+                                            </td>
+
+                                            <td>
+
+                                                  <Link to={"/edit_user/"+ user._id}>
+                                                      <i className="fas fa-edit" title="Edit"></i>
+                                                  </Link>
+                                                  <i className="fas fa-trash-alt" title="Remove"></i>
+                                            </td>
+                                             
+                                             <td>Action</td>
+
+                                        </tr>
+
+                                   })
+
+                                }
+
+                                   
 
 
                             </tbody>
@@ -246,7 +295,10 @@ function Profile() {
 
             </div>
         </div>
+        
+    </>
     )
 }
+
 
 export default Profile

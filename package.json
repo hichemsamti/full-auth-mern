@@ -1,5 +1,5 @@
 {
-  "name": "fullAuth",
+  "name": "fullauth",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -21,7 +21,7 @@
     "nodemon": "^2.0.12"
   },
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js --ignore client"
   },
   "repository": {
     "type": "git",
