@@ -6,6 +6,7 @@ import {isLength, isMatch} from "../../utils/validation/Validation"
 import {showSuccessMsg,showErrMsg} from "../../utils/notifications/Notification"
 import "./profile.css"
 import {fetchAllUsers , dispatchGetAllUsers} from "../../../redux/actions/usersAction"
+import { ideahub } from 'googleapis/build/src/apis/ideahub'
 
 
 
@@ -157,7 +158,35 @@ function Profile() {
     }
 
 
+   
+    const handleDelete = async (id) => {
+       
+        try {
 
+            if(user._id !== id){
+
+                if(window.confirm("Delete this Account ?")) {
+                    setLoading(true)
+                    await axios.delete("/user/delete/" + id, {
+                        headers: {Authorization:token}
+                    })
+    
+                    setLoading(false)
+                    setCallback(!callback)
+    
+                }
+
+
+            }
+
+            
+
+
+        } catch (err){
+            setData({...data,err:err.response.data.msg, success:""})
+        }
+
+    }
 
     return (
         <>
@@ -191,7 +220,7 @@ function Profile() {
                   <div className="form_group">
                      <label htmlFor="name">Name</label>
                      <input type="text" name="name" 
-                     placeholder="Enter name" value={name} defaultValue={user.name} onChange={handleChange}/>
+                     placeholder="Enter name"  defaultValue={user.name} onChange={handleChange}/>
 
                   </div>
 
@@ -199,7 +228,7 @@ function Profile() {
                   <div className="form_group">
                      <label htmlFor="email">Email</label>
                      <input type="email" name="email" 
-                     placeholder="Enter email" value={email} defaultValue={user.email} disabled/>
+                     placeholder="Enter email"  defaultValue={user.email} disabled/>
 
                   </div>
 
@@ -273,7 +302,8 @@ function Profile() {
                                                   <Link to={"/edit_user/"+ user._id}>
                                                       <i className="fas fa-edit" title="Edit"></i>
                                                   </Link>
-                                                  <i className="fas fa-trash-alt" title="Remove"></i>
+                                                  <i className="fas fa-trash-alt" title="Remove"
+                                                  onClick={()=>handleDelete(user._id)}></i>
                                             </td>
                                              
                                              <td>Action</td>
