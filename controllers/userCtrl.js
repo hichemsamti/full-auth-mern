@@ -3,6 +3,10 @@ const bcrypt = require("bcrypt")
 const jwt = require ("jsonwebtoken")
 const sendMail= require("./sendMail")
 const auth = require('../middleware/auth')
+const {google} = require("googleapis")
+const {OAuth2} = google.auth
+
+const client = new OAuth2(process.env.MAILING_SERVICE_CLIENT_ID)
 
 const {CLIENT_URL} = process.env
 
@@ -290,9 +294,31 @@ const userCtrl = {
 
 
 
+    googleLogin: async (req,res) => {
+
+        try{
+          
+            const {tokenId} = req.body
+
+            const verify = await client.verifyIdToken({idToken: tokenId, audience:process.env.MAILING_SERVICE_CLIENT_ID})
+
+            console.log(verify)
+        }catch(err){
+
+
+        }
+    }
+
+
+
 
 
 }
+
+
+
+
+
 
 
    
